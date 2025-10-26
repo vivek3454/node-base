@@ -1,12 +1,16 @@
-import { Button } from "@/components/ui/button";
+import { requireAuth } from "@/lib/auth-utils";
+import { caller } from "@/trpc/server";
 
-const Page = () => {
-  return ( 
-    <div className="text-red-600 text-2xl font-extrabold">
-      Home page
-      <Button>Click Me</Button>
+const Page = async () => {
+  await requireAuth();
+
+  const {data} = await caller.getUsers()
+
+  return (
+    <div className="min-h-screen min-w-screen flex items-center justify-center">
+      Protected server component
     </div>
-   );
-}
- 
+  );
+};
+
 export default Page;
