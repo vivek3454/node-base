@@ -55,17 +55,22 @@ export function RegisterForm() {
   });
   const onSubmit = async (data: RegisterFormValues) => {
     console.log("data", data);
-    await authClient.signUp.email({
-      name:data.email,
-      email:data.email,
-      password:data.password,
-      callbackURL:"/"
-    },{
-      onSuccess:()=> {router.push("/")},
-      onError:(ctx)=>{
-        toast.error(ctx.error.message)
+    await authClient.signUp.email(
+      {
+        name: data.email,
+        email: data.email,
+        password: data.password,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        },
       }
-    })
+    );
   };
 
   const isPending = form.formState.isSubmitting;
@@ -88,6 +93,12 @@ export function RegisterForm() {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/logos/github.svg"
+                      width={20}
+                      height={20}
+                      alt="Github"
+                    />
                     Continue with GitHub
                   </Button>
                   <Button
@@ -96,6 +107,12 @@ export function RegisterForm() {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/logos/google.svg"
+                      width={20}
+                      height={20}
+                      alt="Google"
+                    />
                     Continue with Google
                   </Button>
                 </div>
