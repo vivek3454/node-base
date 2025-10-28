@@ -3,6 +3,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Check } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,13 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           {children}
-          <Toaster />
+          <Toaster
+            richColors
+            position="top-center"
+            closeButton
+            theme="light"
+            // icons={{ success: <Check /> }}
+          />
         </TRPCReactProvider>
       </body>
     </html>
