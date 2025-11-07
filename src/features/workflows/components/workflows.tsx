@@ -1,10 +1,14 @@
 "use client";
 
 import {
+  EmptyView,
   EntityContainer,
   EntityHeader,
+  EntityList,
   EntityPagination,
   EntitySearch,
+  ErrorView,
+  LoadingView,
 } from "@/components/entity-components";
 import {
   useCreateWorkflow,
@@ -24,17 +28,28 @@ export const WorkflowsSearch = () => {
   });
 
   return (
-    <EntitySearch value={searchValue} onChange={onSearchChange} placeholder="Search workflows" />
+    <EntitySearch
+      value={searchValue}
+      onChange={onSearchChange}
+      placeholder="Search workflows"
+    />
   );
 };
 
 export const WorkflowsList = () => {
   const workflows = useSuspenseWorkflows();
 
+  // if (workflows.data.items.length === 0) {
+  //   return <WorkflowsEmpty />;
+  // }
+
   return (
-    <div className="flex-1 flex justify-center items-center">
-      <p>{JSON.stringify(workflows.data, null, 2)}</p>
-    </div>
+    <EntityList
+      items={workflows.data.items}
+      getKey={(workflow) => workflow.id}
+      renderItem={(workflow) => <p>{workflow.name}</p>}
+      emptyView={<WorkflowsEmpty />}
+    />
   );
 };
 
@@ -68,19 +83,19 @@ export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
   );
 };
 
-export const WorkflowsPagination = ()=>{
-  const workflow = useSuspenseWorkflows()
-  const [params,setParams] = useWorkflowsParams();
+export const WorkflowsPagination = () => {
+  const workflow = useSuspenseWorkflows();
+  const [params, setParams] = useWorkflowsParams();
 
   return (
-    <EntityPagination 
-    disabled={workflow.isFetching}
-    totalPages={workflow.data.totalPages}
-    page={workflow.data.page}
-    onPageChange={ (page)=> setParams({...params,page})}
-     />
-  )
-}
+    <EntityPagination
+      disabled={workflow.isFetching}
+      totalPages={workflow.data.totalPages}
+      page={workflow.data.page}
+      onPageChange={(page) => setParams({ ...params, page })}
+    />
+  );
+};
 
 export const WorkflowsContainer = ({
   children,
@@ -95,5 +110,41 @@ export const WorkflowsContainer = ({
     >
       {children}
     </EntityContainer>
+  );
+};
+
+export const WorkflowsLoading = () => {
+  return <LoadingView message="Loading workflows..." />;
+};
+
+export const WorkflowsError = () => {
+  return <ErrorView message="Error loading workflows..." />;
+};
+
+export const WorkflowsEmpty = () => {
+  const createWorkflow = useCreateWorkflow();
+  const router = useRouter();
+
+  const { handleError, modal } = useUpgradeModal();
+
+  const handleCreate = () => {
+    createWorkflow.mutate(undefined, {
+      onError: (error) => {
+        handleError(error);
+      },
+      onSuccess: (data) => {
+        router.push(`/workflows/${data.id}`);
+      },
+    });
+  };
+
+  return (
+    <>
+      {modal}
+      <EmptyView
+        onNew={handleCreate}
+        message="No workflows found. Get started by creating a workflow"
+      />
+    </>
   );
 };
